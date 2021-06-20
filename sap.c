@@ -35,14 +35,24 @@ void *sap(void *arg) {
 	
 	// start adding sdp lines to the packet
 	char *payload = packet->payload;
-	char *ptime;
+	char *ptime = NULL;
 	
 	switch (mai.args.ptime) {
-		case 4000: ptime = (mai.args.rate == 44100) ? "4.35" : "4";
-		case 1000: ptime = (mai.args.rate == 44100) ? "1.09" : "1";
-		case  333: ptime = (mai.args.rate == 44100) ? "0.36" : "0.33";
-		case  250: ptime = (mai.args.rate == 44100) ? "0.27" : "0.25";
-		case  125: ptime = (mai.args.rate == 44100) ? "0.13" : "0.12";
+		case 4000:
+			ptime = (mai.args.rate == 44100) ? "4.35" : "4";
+			break;
+		case 1000:
+			ptime = (mai.args.rate == 44100) ? "1.09" : "1";
+			break;
+		case  333:
+			ptime = (mai.args.rate == 44100) ? "0.36" : "0.33";
+			break;
+		case  250:
+			ptime = (mai.args.rate == 44100) ? "0.27" : "0.25";
+			break;
+		case  125:
+			ptime = (mai.args.rate == 44100) ? "0.13" : "0.12";
+			break;
 	}
 	
 	payload += sprintf(payload, "v=0\r\n");
@@ -54,7 +64,9 @@ void *sap(void *arg) {
 	payload += sprintf(payload, "i=%s\r\n", mai.args.title);
 	payload += sprintf(payload, "a=rtpmap:96 L%d/%d/%d\r\n", mai.args.bits, mai.args.rate, mai.args.channels);
 	payload += sprintf(payload, "a=recvonly\r\n");
-	payload += sprintf(payload, "a=ptime:%s\r\n", ptime);
+	if(ptime != NULL) {
+		payload += sprintf(payload, "a=ptime:%s\r\n", ptime);
+	}
 	payload += sprintf(payload, "a=ts-refclk:ptp=IEEE1588-2008:%s\r\n", mai_ptp_source());
 	payload += sprintf(payload, "a=mediaclk:direct=0\r\n");
 	
